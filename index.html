@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <h1>THREE.JS Rocks</h1>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/102/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+    <script>
+      //----BASICS----//
+      //three important variables for beginning (scene,camera,renderer)
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      //to see 3d object
+      //if we change the position to smaller value it will be bigger because it becomes nearer to us
+      //if otherwise , it will be very small and far away
+      camera.position.z = 4;
+      var renderer = new THREE.WebGLRenderer({ antialias: true });
+      //set background color
+      renderer.setClearColor("#e5e5e5");
+      //set size of renderer
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      //show on the screen
+      document.body.appendChild(renderer.domElement);
+      //to make it responsive
+      window.addEventListener("resize", () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
+      var raycaster = new THREE.Raycaster();
+      var mouse = new THREE.Vector2();
+      //----ADD 3D ELEMENT----//
+      var geometry = new THREE.BoxGeometry(1, 1, 1);
+      var material = new THREE.MeshLambertMaterial({ color: 0xf7f7f7 });
+      //combine geometry and material in a mesh
+      // var mesh = new THREE.Mesh(geometry, material);
+      //change the position of a mesh
+      //mesh.position.set(2, 2, -2);
+      //for rotation
+      // mesh.rotation.set(45, 0, 0);
+      //for scaling
+      // mesh.scale.set(1, 2, 1);
+      // scene.add(mesh);
+      //add alot of 3d objects
+      meshX = -10;
+      for (var i = 0; i < 15; i++) {
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = (Math.random() - 0.5) * 10;
+        mesh.position.y = (Math.random() - 0.5) * 10;
+        mesh.position.z = (Math.random() - 0.5) * 10;
+        scene.add(mesh);
+        meshX += 1;
+      }
+      //create another object
+      // var geometry = new THREE.BoxGeometry(1, 1, 1);
+      // var material = new THREE.MeshLambertMaterial({ color: 0xffcc00 });
+      // var mesh = new THREE.Mesh(geometry, material);
+      // mesh.position.y = 2;
+      scene.add(mesh);
+      //lightening the 3d object
+      var light = new THREE.PointLight(0xffffff, 1, 1000);
+      light.position.set(0, 0, 0);
+      scene.add(light);
+      var light = new THREE.PointLight(0xffffff, 2, 1000);
+      light.position.set(0, 0, 25);
+      scene.add(light);
+      //to remove the distortion from the box so if we resize the screen it won't change
+      var render = function () {
+        requestAnimationFrame(render);
+        //for rotation & scaling animation
+        // mesh.rotation.x += 0.05;
+        // mesh.rotation.y += 0.01;
+        // mesh.scale.x -= 0.01;
+        //to make color of background appears---BASICS---//
+        renderer.render(scene, camera);
+      };
+      render();
+      //to make animation using tweenmax & greensocks timeline library
+
+      //to make it happens once hover
+      window.addEventListener("mousemove", onMouseMove);
+      //what will happen when mouse moves
+      function onMouseMove(event) {
+        event.preventDefault();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        var intersects = raycaster.intersectObjects(scene.children, true);
+        for (var i = 0; i < intersects.length; i++) {
+          this.tl = new TimelineMax();
+          this.tl.to(intersects[i].object.scale, 1, {
+            x: 2,
+            ease: Expo.easeOut,
+          });
+          this.tl.to(intersects[i].object.scale, 0.5, {
+            x: 0.5,
+            ease: Expo.easeOut,
+          });
+          this.tl.to(intersects[i].object.position, 0.5, {
+            x: 2,
+            ease: Expo.easeOut,
+          });
+          this.tl.to(
+            intersects[i].object.rotation,
+            0.5,
+            {
+              y: Math.PI * 5,
+              ease: Expo.easeOut,
+            },
+            "=-1.5"
+          );
+        }
+      }
+    </script>
+  </body>
+</html>
